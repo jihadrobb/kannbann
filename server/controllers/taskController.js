@@ -46,5 +46,16 @@ class Controller{
         .then(data => res.status(200).json(deleted))
         .catch(err => next(err));
     }
+    static details(req, res, next){
+        Task.findByPk(req.params.id)
+        .then(data => {
+            if(!data){
+                throw { name: 'DataNotFound' };
+            } else {
+                res.status(200).json(data);
+            }
+        })
+        .catch(err => next(err));
+    }
 }
 module.exports = Controller;
