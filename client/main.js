@@ -37,8 +37,8 @@ new Vue({
                 }
             })
             .then(response => {
-                const { token } = response.data;
-                localStorage.setItem('token', token);
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('currentUserId', response.data.id)
                 this.isLoggedIn = true;
                 this.getTask();
             })
@@ -82,6 +82,7 @@ new Vue({
             })
             .then(_=> {
                 localStorage.removeItem('token');
+                localStorage.removeItem('currentUserId');
                 this.isLoggedIn = false;
                 this.tasks = [];
             })
@@ -249,11 +250,19 @@ new Vue({
             .then(value => {
                 switch(value){
                     case 'delete':
-                        this.delete(id);
-                        return false;
+                        if(!this.authorization(data.UserId)){
+                            throw 'Not Authorized to do this';
+                        } else {
+                            this.delete(id);
+                            return false;
+                        }
                     case 'edit':
-                        this.edit(id);
-                        return false;
+                        if(!this.authorization(data.UserId)){
+                            throw 'Not Authorized to do this';
+                        } else {
+                            this.edit(id);
+                            return false;
+                        }
                     case null: // if clicked outside alert box
                         break;
                     default:
@@ -279,7 +288,12 @@ new Vue({
                 }
             })
             .catch(err => {
-                const errMsg = err.response.data.message;
+                let errMsg;
+                if(typeof err === 'string'){
+                    errMsg = err;
+                } else {
+                    errMsg = err.response.data.message;
+                }
                 this.errorAlert(errMsg);
             });
         },
@@ -323,8 +337,10 @@ new Vue({
                 })
             })
             .then(res => {
-                console.log(res.data);
                 this.getTask();
+                swal(`Task edited`, {
+                    icon: 'success',
+                });
             })
             .catch(err => {
                 const errMsg = err.response.data.message;
@@ -353,15 +369,23 @@ new Vue({
             })
             .then(response => {
                 this.getTask();
-                return swal("Task deleted", {
-                    icon: "success",
-                });
-
+                if(response.data){
+                    swal("Task deleted", {
+                        icon: "success",
+                    });
+                }
             })
             .catch(err => {
                 const errMsg = err.response.data.message;
                 this.errorAlert(errMsg);
             });
+        },
+        authorization(taskUserId){
+            if(Number(localStorage.currentUserId) !== taskUserId){
+                return false;
+            } else {
+                return true;
+            }
         },
         errorAlert(message){
             if(Array.isArray(message)){
