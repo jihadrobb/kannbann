@@ -323,7 +323,8 @@ new Vue({
                     },
                 })
             })
-            .then(title=> {
+            .then(title => {
+                console.log(title);
                 return axios({
                     method: 'put',
                     url: this.baseUrl + `/tasks/${id}`,

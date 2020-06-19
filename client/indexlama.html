@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <title>Kanban App</title>
+  </head>
+  <body>
+    <div id="app">
+        <section class="m-2 login-form" v-if="(!isLoggedIn) && (!registerPage)">
+          <h2>Login to continue</h2>
+          <div class="mb-2">
+              <small>or click <a href="" v-on:click.prevent="toRegister()">here</a> to register</small>
+          </div>
+          <form @submit.prevent="login()">
+            <div class="form-group">
+              <label for="email_login">Email address:</label>
+              <input type="email" class="form-control" id="email_login" v-model="email_login">
+            </div>
+            <div class="form-group">
+              <label for="password_login">Password:</label>
+              <input type="password" class="form-control" id="password_login" v-model="password_login">
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+          </form>
+        </section>
+
+        <section class="m-2 register-form" v-if="registerPage">
+            <h2>Register new user</h2>
+            <form @submit.prevent="register()">
+              <div class="form-group">
+                <label for="email_register">Email address:</label>
+                <input type="email" class="form-control" id="email_register" v-model="email_register">
+              </div>
+              <div class="form-group">
+                <label for="password_register">Password:</label>
+                <input type="password" class="form-control" id="password_register" v-model="password_register">
+              </div>
+              <button type="submit" class="btn btn-success">Register</button>
+              <button type="button" class="btn btn-danger" v-on:click="toLogin()">Cancel</button>
+            </form>
+        </section>
+
+        <section class="main-page" v-if="isLoggedIn">   
+        <div class="navbar custom-navbar">
+            <div class="btn btn-primary">Kanban App</div>
+            <button class="btn btn-danger m-2" v-on:click="logout()">logout</button>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col bg-secondary mx-2 my-1 ">
+                    <strong>Backlog</strong> 
+                    <div class="card-container">
+                        <div class="card my-1" v-for="task in getBacklog">
+                            <div class="card-body p-2 btn btn-light" @click.prevent="details(task.id)">{{ task.title }}</div>
+                        </div>
+                    </div>
+                    <a href="" @click.prevent="addTask('backlog')"><small>Add a card...</small></a>
+                </div>
+                <div class="col bg-secondary mx-2 my-1 ">
+                    <strong>Todo</strong> 
+                    <div class="card-container">
+                        <div class="card my-1" v-for="task in tasks" v-if="task.category === 'todo'">
+                            <div class="card-body p-2 btn btn-light" @click.prevent="details(task.id)">{{ task.title }}</div>
+                        </div>
+                    </div>
+                    <a href="" @click.prevent="addTask('todo')"><small>Add a card...</small></a>
+                </div>
+                <div class="col bg-secondary mx-2 my-1 ">
+                    <strong>Doing</strong> 
+                    <div class="card-container">
+                        <div class="card my-1" v-for="task in tasks" v-if="task.category === 'doing'">
+                            <div class="card-body p-2 btn btn-light" @click.prevent="details(task.id)">{{ task.title }}</div>
+                        </div>
+                    </div>
+                    <a href="" @click.prevent="addTask('doing')"><small>Add a card...</small></a>
+                </div>
+                <div class="col bg-secondary mx-2 my-1 ">
+                    <strong>Done</strong> 
+                    <div class="card-container">
+                        <div class="card my-1" v-for="task in tasks" v-if="task.category === 'done'">
+                            <div class="card-body p-2 btn btn-light" @click.prevent="details(task.id)">{{ task.title }}</div>
+                        </div>
+                    </div>
+                    <a href="" @click.prevent="addTask('done')"><small>Add a card...</small></a>
+                </div>
+                
+            </div>
+        </div>
+        </section>
+    </div>
+    <!-- Sweet Alert 1 & 2 -->
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script> -->
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>
