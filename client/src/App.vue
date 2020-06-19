@@ -50,7 +50,7 @@ export default {
   },
   data () {
     return {
-      baseUrl: 'http://localhost:3000',
+      baseUrl: 'https://kannbannn.herokuapp.com',
       isLoggedIn: false,
       registerPage: false,
       categories: ['backlog', 'todo', 'doing', 'done'],

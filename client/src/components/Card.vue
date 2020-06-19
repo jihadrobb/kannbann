@@ -13,7 +13,7 @@ export default {
     props: ['task'],
     data(){
         return {
-            baseUrl: 'http://localhost:3000',
+            baseUrl: 'https://kannbannn.herokuapp.com',
             title: ''
         }
     },

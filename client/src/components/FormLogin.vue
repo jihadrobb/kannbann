@@ -28,13 +28,14 @@ export default {
         return {
             email_login: '',
             password_login: '',
+            baseUrl: 'https://kannbannn.herokuapp.com'
         }
     },
     methods: {
         login(){
             Axios({
                 method: 'post',
-                url: 'http://localhost:3000/login',
+                url: this.baseUrl + '/login',
                 data: {
                     email: this.email_login,
                     password: this.password_login

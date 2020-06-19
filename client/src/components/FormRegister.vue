@@ -24,6 +24,7 @@ export default {
     name: 'FormRegister',
     data(){
         return {
+            baseUrl: 'https://kannbannn.herokuapp.com',
             email_register: '',
             password_register: '',
         }
@@ -32,7 +33,7 @@ export default {
         register(){
             Axios({
                 method: 'post',
-                url: 'http://localhost:3000/register',
+                url: this.baseUrl + '/register',
                 data: {
                     email: this.email_register,
                     password: this.password_register

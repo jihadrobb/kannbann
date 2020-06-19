@@ -24,7 +24,7 @@ export default {
     props: ['tasks', 'category'],
     data(){
         return {
-            baseUrl: 'http://localhost:3000'
+            baseUrl: 'https://kannbannn.herokuapp.com'
         }
     },
     computed: {
