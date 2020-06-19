@@ -2,7 +2,7 @@
   <div>
     <section class="m-2 login-form" v-if="(!isLoggedIn) && (!registerPage)">
       <FormLogin v-on:loginUser="login" v-on:toRegister="toRegister" v-on:error="errorAlert"></FormLogin>
-      <button @click="googleSign">Google</button>
+      <button class="btn btn-success my-2" @click="googleSign">Sign in With Google</button>
     </section>
     <section class="m-2 register-form" v-if="registerPage">
         <FormRegister v-on:toLogin="toLogin" v-on:error="errorAlert"></FormRegister>
