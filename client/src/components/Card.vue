@@ -122,6 +122,8 @@ export default {
                 return swal(response.data.title, { buttons });
             })
             .then(value => {
+                console.log(data.UserId, 'id di data');
+                // console.log(currentUserId, 'id di localstorage')
                 switch(value){
                     case 'delete':
                     if(!this.authorization(data.UserId)){
@@ -198,7 +200,6 @@ export default {
                 })
             })
             .then(title => {
-                console.log(title);
                 return axios({
                     method: 'put',
                     url: this.baseUrl + `/tasks/${id}`,

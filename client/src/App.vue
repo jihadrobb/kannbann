@@ -122,7 +122,10 @@ export default {
         })
       })
       .then(response => {
-        this.login(response.data);
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('currentUserId', response.data.id);
+        this.isLoggedIn = true;
+        this.getTask();
       })
       .catch(err => {
         this.errorAlert(err);
