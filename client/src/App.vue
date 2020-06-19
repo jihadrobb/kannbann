@@ -2,7 +2,7 @@
   <div>
     <section class="m-2 login-form" v-if="(!isLoggedIn) && (!registerPage)">
       <FormLogin v-on:loginUser="login" v-on:toRegister="toRegister" v-on:error="errorAlert"></FormLogin>
-       <GoogleLogin :params="params" :renderParams="renderParams" :onSuccess="onSuccess" :onFailure="onFailure"></GoogleLogin>
+      <button @click="googleSign">Google</button>
     </section>
     <section class="m-2 register-form" v-if="registerPage">
         <FormRegister v-on:toLogin="toLogin" v-on:error="errorAlert"></FormRegister>
@@ -15,10 +15,15 @@
         </div>
         <div class="container">
             <div class="row">
-              <CardContainer v-bind:category="categories[0]" v-bind:backlogs="getBacklog" v-on:refresh="refresh" v-on:error="errorAlert"></CardContainer>
-              <CardContainer v-bind:category="categories[1]" v-bind:todos="getTodo" v-on:refresh="refresh" v-on:error="errorAlert"></CardContainer>
-              <CardContainer v-bind:category="categories[2]" v-bind:doings="getDoing" v-on:refresh="refresh" v-on:error="errorAlert"></CardContainer>
-              <CardContainer v-bind:category="categories[3]" v-bind:dones="getDone" v-on:refresh="refresh" v-on:error="errorAlert"></CardContainer>  
+              <CardContainer 
+              v-for="cat in categories"
+              v-bind:key="cat"
+              v-bind:tasks="tasks" 
+              v-bind:category="cat" 
+              v-bind:backlogs="getBacklog" 
+              v-on:refresh="refresh" 
+              v-on:error="errorAlert">
+              </CardContainer>
             </div>
         </div>
         </section>
@@ -30,36 +35,25 @@
 import FormLogin from "./components/FormLogin";
 import FormRegister from "./components/FormRegister";
 import CardContainer from "./components/CardContainer";
-import GoogleLogin from 'vue-google-login';
-import Axios from 'axios';
+import GAuth from 'vue-google-oauth2'
+// import GoogleLogin from 'vue-google-login';
+import axios from 'axios';
 
 export default {
   name: 'App',
   components: {
     FormLogin,
     FormRegister,
-    GoogleLogin,
+    GAuth,
+    // GoogleLogin,
     CardContainer
   },
   data () {
     return {
       baseUrl: 'http://localhost:3000',
-      email_login: '',
-      password_login: '',
-      email_register: '',
-      password_register: '',
       isLoggedIn: false,
       registerPage: false,
-      editPage: false,
       categories: ['backlog', 'todo', 'doing', 'done'],
-      params: {
-        client_id: "809177839151-qu1s38pkpsht3tqprff9emd4pf7crqlv.apps.googleusercontent.com"
-        },
-      renderParams: {
-        width: 250,
-        height: 50,
-        longtitle: true
-      },
       tasks: []
     }
   },
@@ -115,28 +109,24 @@ export default {
     toRegister(){
       this.registerPage = true;
     },
-    onSuccess(googleUser){
-      // console.log(googleUser.getBasicProfile().getId());
-      Axios({
-        method: 'post',
-        url: this.baseUrl + '/googleSign',
-        data: {
-          id_token: googleUser.getBasicProfile().getId()
-        }
+    googleSign(){
+      this.$gAuth.signIn()
+      .then(data => {
+        const { id_token } = data.wc;
+        return axios({
+          method: 'post',
+          url: this.baseUrl + '/googleSign',
+          data: {
+            id_token
+          }
+        })
       })
       .then(response => {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('currentUserId', response.data.id);
-        this.isLoggedIn = true;
-        this.getTask();
+        this.login(response.data);
       })
       .catch(err => {
-        const errMsg = err.response.data.message;
-        this.errorAlert(errMsg);
-      });
-    },
-    onFailure(err){
-      console.log(err);
+        this.errorAlert(err);
+      })
     },
     logout(){
       swal({
@@ -146,6 +136,7 @@ export default {
       .then(_=> {
         localStorage.removeItem('token');
         localStorage.removeItem('currentUserId');
+        this.$gAuth.signOut();
         this.isLoggedIn = false;
         this.tasks = [];
       })
@@ -171,90 +162,6 @@ export default {
         this.tasks.sort((a, b) => {
             return a.id - b.id;
         })
-      })
-      .catch(err => {
-        const errMsg = err.response.data.message;
-        this.errorAlert(errMsg);
-      });
-    },
-    edit(id){
-      let task;
-      axios({
-        method: 'get',
-        url: this.baseUrl + `/tasks/${id}`,
-        headers: {
-          token: localStorage.token
-        }
-      })
-      .then(response => {
-        task = response.data;
-        return swal({
-          text: 'Input Title',
-          content: {
-              element: "input",
-              attributes: {
-                value: task.title,
-                type: "text",
-              }
-        },
-          button: {
-            text: "Submit",
-            closeModal: true,
-          },
-        })
-      })
-      .then(title => {
-        console.log(title);
-        return axios({
-          method: 'put',
-          url: this.baseUrl + `/tasks/${id}`,
-          headers: {
-            token: localStorage.token
-          },
-          data: {
-            title,
-            category: task.category
-          }
-        })
-      })
-      .then(res => {
-        this.getTask();
-        swal(`Task edited`, {
-          icon: 'success',
-        });
-      })
-      .catch(err => {
-        const errMsg = err.response.data.message;
-        this.errorAlert(errMsg);
-      });
-    },
-    delete(id){
-      swal({
-        title: "Are you sure?",
-        icon: "warning",
-        buttons: true,
-        dangerMode: true,
-      })
-      .then(yes => {
-        if(yes){
-          return axios({
-            method: 'delete',
-            url: this.baseUrl + `/tasks/${id}`,
-            headers: {
-                token: localStorage.token
-            }
-          });
-        } else {
-          return swal("Cancelled");
-        }
-      })
-      .then(response => {
-        this.getTask();
-        if(response.data){
-          swal("Task deleted", {
-            icon: "success",
-          });
-        }
       })
       .catch(err => {
         const errMsg = err.response.data.message;

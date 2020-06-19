@@ -1,6 +1,7 @@
 const { User } = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
 class Controller{
     static reg(req, res, next){
         User.findOne({ where: { email: req.body.email }})
@@ -59,7 +60,7 @@ class Controller{
                     id: data.id,
                     email: data.email
                 }, process.env.JWT_SECRET );
-                return res.status(200).json({ id: data.id, email: data.email, token });
+                res.status(200).json({ id: data.id, email: data.email, token });
             } else {
                 return User.create({
                     email,
