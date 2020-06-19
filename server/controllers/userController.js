@@ -41,7 +41,6 @@ class Controller{
             next(err);
         });
     }
-    /*
     static gSign(req, res, next){
         let { id_token } = req.body;
         let email;
@@ -79,6 +78,5 @@ class Controller{
             next(err);
         })
     }
-    */
 }
 module.exports = Controller;
