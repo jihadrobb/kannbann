@@ -9,7 +9,7 @@
   "author": "jihadrobb",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "sweetalert": "^2.1.2",
     "vue": "^2.6.11",
     "vue-google-login": "^2.0.5",
